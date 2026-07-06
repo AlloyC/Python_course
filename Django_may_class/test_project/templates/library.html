@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Library{% endblock %}
+
+{% block content %}
+<h2>Upload a new book</h2>
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Upload</button>
+</form>
+{% for book in books %}
+    {% if book.reviewed %}
+    <div class="card bg-success">
+        <img src="{{ book.image.url }}" width="300" height="400" alt="{{book.title}}">
+        <p>{{ book.title }} by {{ book.author }}</p>
+    </div>
+    {% endif %}
+{% endfor %}
+{% endblock %}

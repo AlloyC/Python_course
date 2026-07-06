@@ -1,8 +1,11 @@
 {% extends "base.html" %} 
 {% block title %}Home page 1{% endblock %} 
 {% block content %}
-<div class="d-flex flex-col justify-content-center align-items-center">
+<div class="d-flex flex-column justify-content-center align-items-center">
     <h1>This is home page 1</h1>
+    
+<h2>Welcome to your dashboard, <span>{{ request.user }}</span></h2>
+<a href="{% url 'logout' %}" class="btn btn-secondary">Logout</a>
 </div>
 <p class="section1">Hello world</p>
 <div class="section-form">

@@ -397,11 +397,144 @@ Response returned
 
 ## CSRF Protection
 - Cross-Site Request Forgery (CSRF) is security attack where another site tries to submit forms onbehalf of another user
-- withpout csfr, django throws 403 forbbiden error meaning csrf verificaton failed
+- without csfr, django throws 403 forbbiden error meaning csrf verificaton failed
+
+## Authentication and Authorization Guide
+
+Brief note: this guide is based on the auth-related views in [test_project/products/views.py](test_project/products/views.py). The file already handles signup, login, and logout, but the `dashboard` view is still open to everyone, so authorization still needs to be applied there.
+
+### Authentication
+
+Authentication answers the question, "Who is the user?" In Django, the built-in forms and session helpers make this simple.
+
+```python
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+```
+
+#### Signup view
+
+`UserCreationForm` creates a new user account. In the current view file, the form is displayed on GET and saved on POST when it is valid.
+
+```python
+def signup(request):
+  form = UserCreationForm
+  if request.method == "POST":
+    form = UserCreationForm(request.POST)
+    if form.is_valid():
+      form.save()
+  return render(request, 'signup.html', {"form": form})
+```
+
+#### Login view
+
+`AuthenticationForm` checks the username and password. After validation, `form.get_user()` returns the authenticated user, and `auth_login()` stores the user in the session.
+
+```python
+def login(request):
+  form = AuthenticationForm
+  if request.method == "POST":
+    form = AuthenticationForm(request, data=request.POST)
+    if form.is_valid():
+      user = form.get_user()
+      auth_login(request, user)
+      return redirect('home1')
+
+  return render(request, 'login.html', {"form": form})
+```
+
+#### Logout view
+
+`auth_logout()` removes the current user from the session, then redirects them to the login page.
+
+```python
+def logout(request):
+  auth_logout(request)
+  return redirect("/products/login")
+```
+
+### Authorization
+
+Authorization answers the question, "What is the user allowed to do?" Authentication alone is not enough for private pages. For example, the current `dashboard` view returns a template without checking whether the user is logged in.
+
+Use `login_required` to protect a view that should only be visible to authenticated users.
+
+```python
+from django.contrib.auth.decorators import login_required
+
+@login_required(login_url='/products/login')
+def dashboard(request):
+  return render(request, 'dashboard.html')
+```
+
+Use permissions or group checks when different users should see different content.
+
+```python
+from django.contrib.auth.decorators import user_passes_test
+
+def is_staff_user(user):
+  return user.is_staff
+
+@user_passes_test(is_staff_user)
+def admin_panel(request):
+  return render(request, 'admin_panel.html')
+```
+
+### Typical flow
+
+1. User opens the signup page and creates an account.
+2. User submits the login form with valid credentials.
+3. Django authenticates the user and creates a session.
+4. Protected pages check whether the session belongs to a logged-in user.
+5. Logout clears the session and sends the user back to the login page.
+
+### Key ideas to remember
+
+- Authentication confirms identity.
+- Authorization controls access.
+- `UserCreationForm` is for registration.
+- `AuthenticationForm` is for login.
+- `auth_login()` and `auth_logout()` manage the session.
+- `login_required` is the simplest way to protect a page.
+- Role-based access can be handled with `user_passes_test`, permissions, or groups.
+
+June 18
 
 - Form validation
 - cleaned form
 - form error display
 - submit form to admin
 - modelForm
-- custom form validation
+- Django validate a form by using ```form.is_valid()``` method.
+- custom form validation - note that the function name clean_< your name choice >. ```clean``` is a keyword that must be used for your custom form validation.
+
+```
+if request.method == "POST":
+    form = JambForm(request.POST)
+    <!-- form validation -->
+    if form.is_valid():
+      <!-- cleaned form data  -->
+      print(form.cleaned_data)
+
+      <!-- Custom validation -->
+      <!-- In thte class for the form -->
+      def clean_age(self):
+        age = self.cleaned_data['age']
+        if age < 18:
+            raise forms.ValidationError("You must be 18 above to submit")
+        return age
+```
+
+
+## Authentication & Authorizations
+- Authentication anwers the question "who are you?"
+- Authorisation answers "what am I allowed to do?"
+- Django comes with inbuilt user model. The models comes with uersname, email, password, first_name, last_name
+- Django has a boilerplate user creation form. To utilize the form simply import user creation form
+```
+  from django.contrib.auth.forms import UserCreationForm
+```
+
+- There are 2 ways to implement the login form in django
+- The first way is using the authenticate property
+- The second way is using the authentication form

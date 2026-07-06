@@ -4,5 +4,11 @@
 <div class="d-flex justify-content-center align-items-center">
     <h1>This is home page 3</h1>
 </div>
+<form action="" method="POST">
+    <!-- {{ form.errors }} -->
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+</form>
 {% endblock %}
     

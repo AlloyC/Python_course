@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profile, students, Posts, Course, Captains, Animals
+from .models import Profile, students, Posts, Course, Captains, Animals, JambForm, Book
 # Method 1: Using a custom admin class to display specific fields and add search and filter options
 class StudentAdmin(admin.ModelAdmin):
     list_display = ('firstname', 'lastname', 'age', 'date')
@@ -29,11 +29,23 @@ class AnimalsAdmin(admin.ModelAdmin):
     search_fields = ("name",)
     list_filter = ("can_fly",)
 
+class JambFormAdmin(admin.ModelAdmin):
+    list_display = ("name", "jamb_number", "email")
+    search_fields = ("name", "jamb_number", "email")
+    list_filter = ("school", "age")
+
+class BookAdmin(admin.ModelAdmin):
+    list_display = ("sn", "title", "subject", "genre")
+    search_fields = ("title", "subject", "genre")
+    list_filter = ("subject", "genre")
+
 # Register your models here.
 admin.site.register(students, StudentAdmin)
 admin.site.register(Animals, AnimalsAdmin)
 admin.site.register(Posts, PostsAdmin)
 admin.site.register(Course)
 admin.site.register(Captains, CaptainsAdmin)
+admin.site.register(JambForm, JambFormAdmin)
+admin.site.register(Book, BookAdmin)
 
 

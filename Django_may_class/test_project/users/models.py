@@ -1,4 +1,7 @@
 from django.db import models
+from django.contrib.auth.models import User
+
+# User.objects.create_user(username='wilson', password='123567')
 
 # Create your models here.
 class Course(models.Model):
@@ -80,3 +83,25 @@ class Animals(models.Model):
 
     def __str__(self):
         return self.name
+    
+class JambForm (models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    jamb_number = models.CharField(max_length=10)
+    school = models.CharField(max_length=100)
+    age = models.IntegerField()
+
+    def __str__(self):
+        return self.name
+    
+class Book(models.Model):
+    sn = models.IntegerField()
+    title = models.CharField(max_length=100)
+    subject = models.CharField(max_length=100)
+    genre = models.CharField(max_length=100)
+    image = models.ImageField(upload_to="Books")
+    reviewed = models.BooleanField(default=False)
+    # author = models.ForeignKey(students, on_delete=models.CASCADE, related_name='books')
+
+    def __str__(self):
+        return self.title
